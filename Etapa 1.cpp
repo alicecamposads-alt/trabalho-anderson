@@ -1,0 +1,431 @@
+/******************************************************************************
+ Alice Risso Campos Faria
+ prof: Anderson Resende
+*******************************************************************************/
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+// Quantidade máxima de contas que o sistema poderá cadastrar
+const int MAX_CONTAS = 5;
+
+// Função para mostrar o cabeçalho do sistema
+void mostrarCabecalho()
+{
+    cout << "*******************" << endl;
+    cout << "BANCO INF101 - AC" << endl;
+    cout << "*******************" << endl;
+}
+
+// Função para cadastrar uma nova conta
+void cadastrarConta(
+    int numeroConta[],
+    string nomeCliente[],
+    string cpf[],
+    int tipoConta[],
+    double saldo[],
+    bool contaAtiva[],
+    int &quantidadeContas)
+{
+    // Verifica se já atingiu o limite de 5 contas
+    if (quantidadeContas >= MAX_CONTAS)
+    {
+        cout << "\nNao e possivel cadastrar outra conta." << endl;
+        cout << "Limite de 5 contas atingido!" << endl;
+        return;
+    }
+
+    int posicao = quantidadeContas;
+
+    cout << "\n========== CADASTRO DE CONTA ==========" << endl;
+
+    // Solicita e valida o numero da conta
+    do
+    {
+        cout << "Numero da conta: ";
+        cin >> numeroConta[posicao];
+
+        if (numeroConta[posicao] <= 0)
+        {
+            cout << "Erro: o numero da conta deve ser maior que zero." << endl;
+        }
+
+    } while (numeroConta[posicao] <= 0);
+
+    // Limpa o ENTER deixado pelo cin
+    cin.ignore();
+
+    // Solicita o nome do cliente
+    cout << "Nome do titular: ";
+    getline(cin, nomeCliente[posicao]);
+
+    // Solicita o CPF
+    cout << "CPF do titular: ";
+    getline(cin, cpf[posicao]);
+
+    // Solicita e valida o tipo da conta
+    do
+    {
+        cout << "Tipo da conta (1 - Corrente / 2 - Poupanca): ";
+        cin >> tipoConta[posicao];
+
+        if (tipoConta[posicao] != 1 && tipoConta[posicao] != 2)
+        {
+            cout << "Erro: o tipo da conta deve ser 1 ou 2." << endl;
+        }
+
+    } while (tipoConta[posicao] != 1 && tipoConta[posicao] != 2);
+
+    // Solicita e valida o saldo inicial
+    do
+    {
+        cout << "Saldo inicial: R$ ";
+        cin >> saldo[posicao];
+
+        if (saldo[posicao] < 0)
+        {
+            cout << "Erro: o saldo inicial nao pode ser negativo." << endl;
+        }
+
+    } while (saldo[posicao] < 0);
+
+    // Toda conta cadastrada começa ativa
+    contaAtiva[posicao] = true;
+
+    quantidadeContas++;
+
+    cout << "\nConta cadastrada com sucesso!" << endl;
+    cout << "A conta foi cadastrada como ATIVA." << endl;
+}
+
+
+// Função para localizar uma conta pelo número
+int localizarConta(int numeroConta[], int quantidadeContas, int numeroProcurado)
+{
+    for (int i = 0; i < quantidadeContas; i++)
+    {
+        if (numeroConta[i] == numeroProcurado)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
+// Função para consultar os dados de uma conta
+void consultarConta(
+    int numeroConta[],
+    string nomeCliente[],
+    string cpf[],
+    int tipoConta[],
+    double saldo[],
+    bool contaAtiva[],
+    int quantidadeContas)
+{
+    if (quantidadeContas == 0)
+    {
+        cout << "\nNenhuma conta cadastrada." << endl;
+        return;
+    }
+
+    int numeroProcurado;
+
+    cout << "\n========== CONSULTAR CONTA ==========" << endl;
+    cout << "Digite o numero da conta: ";
+    cin >> numeroProcurado;
+
+    int posicao = localizarConta(
+        numeroConta,
+        quantidadeContas,
+        numeroProcurado
+    );
+
+    if (posicao == -1)
+    {
+        cout << "\nConta nao encontrada." << endl;
+        return;
+    }
+
+    cout << "\n---------- DADOS DA CONTA ----------" << endl;
+    cout << "Numero da conta: " << numeroConta[posicao] << endl;
+    cout << "Nome do titular: " << nomeCliente[posicao] << endl;
+    cout << "CPF: " << cpf[posicao] << endl;
+
+    cout << "Tipo da conta: ";
+
+    if (tipoConta[posicao] == 1)
+    {
+        cout << "Corrente" << endl;
+    }
+    else
+    {
+        cout << "Poupanca" << endl;
+    }
+
+    cout << "Saldo: R$ " << saldo[posicao] << endl;
+
+    cout << "Situacao: ";
+
+    if (contaAtiva[posicao])
+    {
+        cout << "ATIVA" << endl;
+    }
+    else
+    {
+        cout << "DESATIVADA" << endl;
+    }
+}
+
+
+// Função para verificar o saldo
+void verificarSaldo(
+    int numeroConta[],
+    double saldo[],
+    bool contaAtiva[],
+    int quantidadeContas)
+{
+    if (quantidadeContas == 0)
+    {
+        cout << "\nNenhuma conta cadastrada." << endl;
+        return;
+    }
+
+    int numeroProcurado;
+
+    cout << "\n========== VERIFICAR SALDO ==========" << endl;
+    cout << "Digite o numero da conta: ";
+    cin >> numeroProcurado;
+
+    int posicao = localizarConta(
+        numeroConta,
+        quantidadeContas,
+        numeroProcurado
+    );
+
+    if (posicao == -1)
+    {
+        cout << "\nConta nao encontrada." << endl;
+        return;
+    }
+
+    // Operação que depende de conta ativa
+    if (!contaAtiva[posicao])
+    {
+        cout << "\nA conta esta desativada." << endl;
+        cout << "Nao e possivel realizar esta operacao." << endl;
+        return;
+    }
+
+    cout << "\nSaldo atual: R$ " << saldo[posicao] << endl;
+}
+
+
+// Função para alterar o tipo da conta
+void alterarTipoConta(
+    int numeroConta[],
+    int tipoConta[],
+    bool contaAtiva[],
+    int quantidadeContas)
+{
+    if (quantidadeContas == 0)
+    {
+        cout << "\nNenhuma conta cadastrada." << endl;
+        return;
+    }
+
+    int numeroProcurado;
+
+    cout << "\n========== ALTERAR TIPO ==========" << endl;
+    cout << "Digite o numero da conta: ";
+    cin >> numeroProcurado;
+
+    int posicao = localizarConta(
+        numeroConta,
+        quantidadeContas,
+        numeroProcurado
+    );
+
+    if (posicao == -1)
+    {
+        cout << "\nConta nao encontrada." << endl;
+        return;
+    }
+
+    // Verifica se a conta está ativa
+    if (!contaAtiva[posicao])
+    {
+        cout << "\nA conta esta desativada." << endl;
+        cout << "Nao e possivel alterar o tipo." << endl;
+        return;
+    }
+
+    int novoTipo;
+
+    do
+    {
+        cout << "\nNovo tipo da conta:" << endl;
+        cout << "1 - Corrente" << endl;
+        cout << "2 - Poupanca" << endl;
+        cout << "Escolha: ";
+        cin >> novoTipo;
+
+        if (novoTipo != 1 && novoTipo != 2)
+        {
+            cout << "Erro: escolha 1 ou 2." << endl;
+        }
+
+    } while (novoTipo != 1 && novoTipo != 2);
+
+    tipoConta[posicao] = novoTipo;
+
+    cout << "\nTipo da conta alterado com sucesso!" << endl;
+}
+
+
+// Função para ativar ou desativar uma conta
+void alterarSituacaoConta(
+    int numeroConta[],
+    bool contaAtiva[],
+    int quantidadeContas)
+{
+    if (quantidadeContas == 0)
+    {
+        cout << "\nNenhuma conta cadastrada." << endl;
+        return;
+    }
+
+    int numeroProcurado;
+
+    cout << "\n========== ATIVAR/DESATIVAR CONTA ==========" << endl;
+    cout << "Digite o numero da conta: ";
+    cin >> numeroProcurado;
+
+    int posicao = localizarConta(
+        numeroConta,
+        quantidadeContas,
+        numeroProcurado
+    );
+
+    if (posicao == -1)
+    {
+        cout << "\nConta nao encontrada." << endl;
+        return;
+    }
+
+    // Inverte a situação da conta
+    contaAtiva[posicao] = !contaAtiva[posicao];
+
+    if (contaAtiva[posicao])
+    {
+        cout << "\nConta ativada com sucesso!" << endl;
+    }
+    else
+    {
+        cout << "\nConta desativada com sucesso!" << endl;
+    }
+}
+
+
+// Programa principal
+int main()
+{
+    // Arrays para armazenar os dados das até 5 contas
+    int numeroConta[MAX_CONTAS];
+    string nomeCliente[MAX_CONTAS];
+    string cpf[MAX_CONTAS];
+    int tipoConta[MAX_CONTAS];
+    double saldo[MAX_CONTAS];
+    bool contaAtiva[MAX_CONTAS];
+
+    // Controla quantas contas já foram cadastradas
+    int quantidadeContas = 0;
+
+    int opcao;
+
+    // Menu permanece funcionando até o usuário escolher 6
+    do
+    {
+        cout << endl;
+
+        mostrarCabecalho();
+
+        cout << "\n1 - Cadastrar conta" << endl;
+        cout << "2 - Consultar conta" << endl;
+        cout << "3 - Verificar saldo" << endl;
+        cout << "4 - Alterar tipo da conta" << endl;
+        cout << "5 - Ativar/Desativar conta" << endl;
+        cout << "6 - Sair" << endl;
+
+        cout << "\nEscolha uma opcao: ";
+        cin >> opcao;
+
+        // Switch utilizado para selecionar a operação
+        switch (opcao)
+        {
+            case 1:
+                cadastrarConta(
+                    numeroConta,
+                    nomeCliente,
+                    cpf,
+                    tipoConta,
+                    saldo,
+                    contaAtiva,
+                    quantidadeContas
+                );
+                break;
+
+            case 2:
+                consultarConta(
+                    numeroConta,
+                    nomeCliente,
+                    cpf,
+                    tipoConta,
+                    saldo,
+                    contaAtiva,
+                    quantidadeContas
+                );
+                break;
+
+            case 3:
+                verificarSaldo(
+                    numeroConta,
+                    saldo,
+                    contaAtiva,
+                    quantidadeContas
+                );
+                break;
+
+            case 4:
+                alterarTipoConta(
+                    numeroConta,
+                    tipoConta,
+                    contaAtiva,
+                    quantidadeContas
+                );
+                break;
+
+            case 5:
+                alterarSituacaoConta(
+                    numeroConta,
+                    contaAtiva,
+                    quantidadeContas
+                );
+                break;
+
+            case 6:
+                cout << "\nEncerrando o sistema..." << endl;
+                cout << "Obrigado por utilizar o Banco INF101!" << endl;
+                break;
+
+            default:
+                cout << "\nOpcao invalida!" << endl;
+                cout << "Escolha uma opcao de 1 a 6." << endl;
+        }
+
+    } while (opcao != 6);
+
+    return 0;
+}
